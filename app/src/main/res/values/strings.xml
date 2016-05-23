@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">PhotoMates</string>
+    <string name="photo_restoring">It is being repaired.</string>
+    <string name="repaire">repaire</string>
+    <string name="please_seleted_photo">Please select the pictures.</string>
+    <string name="please_re_seleted_photo">Please re select the pictures.</string>
+    <string name="Success">Success</string>
+</resources>
