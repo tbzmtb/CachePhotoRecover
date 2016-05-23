@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">포토메이츠</string>
+    <string name="app_name">CachePhotoRecover</string>
     <string name="photo_restoring">소중한 사진을 복구 하는 중입니다.</string>
     <string name="repaire">복구</string>
     <string name="please_seleted_photo">사진을 선택해 주세요.</string>
