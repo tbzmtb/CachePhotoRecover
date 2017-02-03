@@ -1,15 +1,20 @@
 package sunyung.kr.photoCacheRecover;
 
+import android.Manifest;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -103,7 +108,77 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        new ScanFileDataTask(MainActivity.this, mDataHandler).execute();
+        if (!checkAppPermission()) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            } else {
+                // 권한 이상 없음
+                new ScanFileDataTask(MainActivity.this, mDataHandler).execute();
+            }
+        }
+//        new ScanFileDataTask(MainActivity.this, mDataHandler).execute();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions,
+                                           int[] grantResults) {
+
+        boolean permissionCheck = true;
+        if (requestCode == 1) {
+            if (grantResults.length == 2) {
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED)
+                    permissionCheck = false;
+                if (grantResults[1] != PackageManager.PERMISSION_GRANTED && permissionCheck)
+                    permissionCheck = false;
+
+                // 권한설정 성공
+                if (permissionCheck) {
+                    new ScanFileDataTask(MainActivity.this, mDataHandler).execute();
+                } else {
+                    Logger.d(TAG, "뭐지1");
+                    finish();
+//                    new ShowPermissionDialog(this, "던파ON 사용을 위해 어플리케이션 권한 (저장공간, 전화, 카메라)을 허용해주시기 바랍니다.");
+                }
+            } else {
+                Logger.d(TAG, "뭐지2");
+                finish();
+//                new ShowPermissionDialog(this, "던파ON 사용을 위해 어플리케이션 권한 (저장공간, 전화, 카메라)을 허용해주시기 바랍니다.");
+            }
+        } else {
+            Logger.d(TAG, "뭐지3");
+            finish();
+//            new ShowPermissionDialog(this, "던파ON 사용을 위해 어플리케이션 권한 (저장공간, 전화, 카메라)을 허용해주시기 바랍니다.");
+        }
+
+    }
+
+    private boolean checkAppPermission() {
+
+        Logger.d(TAG, "Build.VERSION.SDK_INT = " + Build.VERSION.SDK_INT);
+        Logger.d(TAG, "Build.VERSION_CODES.LOLLIPOP = " + Build.VERSION_CODES.LOLLIPOP);
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            if (checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            } else if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            } else if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            } else if (checkSelfPermission(Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            } else if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            } else {
+                return true;
+            }
+
+        } else {
+            // 미쉬멜로 아하 버전은 자동 설정됨.
+            return true;
+        }
     }
 
     public String getItemId(ArrayList<GridViewData> data) {

@@ -4,12 +4,21 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.os.EnvironmentCompat;
+import android.text.TextUtils;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Created by tbzm on 16. 4. 25.
@@ -20,6 +29,8 @@ public class ScanFileDataTask extends AsyncTask<String, Void, ArrayList<GridView
     private final String TAG = getClass().getName();
     private ArrayList<GridViewData> data;
     private ProgressDialog mProgressDialog;
+    private static final Pattern DIR_SEPORATOR = Pattern.compile("/");
+
 
     public ScanFileDataTask(Context context, Handler handler) {
         mContext = context;
@@ -39,10 +50,10 @@ public class ScanFileDataTask extends AsyncTask<String, Void, ArrayList<GridView
     @Override
     protected ArrayList<GridViewData> doInBackground(String... args) {
         String root = Environment.getExternalStorageDirectory().getAbsolutePath();
+        Logger.d(TAG, "root = "+root);
         checkFileOfDirectory(getFileList(root));
         return data;
     }
-
 
     public void checkFileOfDirectory(File[] fileList) {
         for (int i = 0; i < fileList.length; i++) {
@@ -65,7 +76,6 @@ public class ScanFileDataTask extends AsyncTask<String, Void, ArrayList<GridView
         if (!fileRoot.isDirectory()) {
             return null;
         }
-
         return fileRoot.listFiles();
     }
 
